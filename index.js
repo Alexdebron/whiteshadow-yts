@@ -33,14 +33,15 @@ async function ytSearch(query) {
                 .then((data) => {
                     // Transform the data to match RapidAPI format
                     const videos = data.all.map(video => ({
+                        type: video.type,
                         id: video.videoId,
                         name: video.title,
                         description: video.description,
                         url: `https://www.youtube.com/watch?v=${video.videoId}`,
                         views: video.views,
                         published: video.ago,
-                        author: video.author,
-                        duration: video.duration.timestamp,
+                        author: video.author.name,
+                        duration: video.timestamp,
                         thumbnail: video.thumbnail,
                         isLive: false
                     }));
