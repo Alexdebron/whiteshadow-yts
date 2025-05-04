@@ -35,9 +35,12 @@ async function ytSearch(query) {
                     const videos = data.all.map(video => ({
                         id: video.videoId,
                         name: video.title,
+                        description: video.description,
                         url: `https://www.youtube.com/watch?v=${video.videoId}`,
                         views: video.views,
-                        duration: video.duration,
+                        published: video.ago,
+                        author: video.author,
+                        duration: video.duration.timestamp,
                         thumbnail: video.thumbnail,
                         isLive: false
                     }));
