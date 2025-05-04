@@ -31,11 +31,20 @@ async function ytSearch(query) {
             // Perform the search
             yts(searchQuery)
                 .then((data) => {
-                    const res = data.all;
-                    resolve(res); // Resolve with the data fetched from YouTube search
+                    // Transform the data to match RapidAPI format
+                    const videos = data.all.map(video => ({
+                        id: video.videoId,
+                        name: video.title,
+                        url: `https://www.youtube.com/watch?v=${video.videoId}`,
+                        views: video.views,
+                        duration: video.duration,
+                        thumbnail: video.thumbnail,
+                        isLive: false
+                    }));
+                    resolve({ videos }); // Return in RapidAPI format
                 })
                 .catch((error) => {
-                    reject(error); // Reject in case of any errors
+                    reject(error);
                     console.error(error);
                 });
         } catch (error) {
@@ -46,25 +55,26 @@ async function ytSearch(query) {
 }
 
 app.get('/', async (req, res) => {
-  const query = req.query.query
-  if (!query) {
-    return res.status(400).json({ creator: 'GiftedTech', status: 400, success: false, error: 'Missing query parameter' })
-  }
+    const query = req.query.q; // Changed from 'query' to 'q' to match RapidAPI
+    if (!query) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Missing query parameter' 
+        });
+    }
 
-  try {
-    const results = await ytSearch(query)
-    res.json({
-      creator: 'GiftedTech',
-      status: 200,
-      success: true,
-      results: results,
-    })
-  } catch (error) {
-    console.error('Error fetching yts data:', error)
-    res.status(500).json({ creator: 'GiftedTech', status: 500, success: false, error: 'Internal Server Error' })
-  }
-})
+    try {
+        const results = await ytSearch(query);
+        res.json(results); // Return the transformed data directly
+    } catch (error) {
+        console.error('Error fetching yts data:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Internal Server Error' 
+        });
+    }
+});
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`)
-})
+    console.log(`Server is running on http://localhost:${port}`);
+});
