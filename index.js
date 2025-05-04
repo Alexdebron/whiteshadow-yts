@@ -1,4 +1,10 @@
 const yts = require("yt-search");
+const express = require("express");
+const app = express();
+app.use(express.json());
+const port = process.env.PORT || 3000;
+app.enable("trust proxy");
+app.set("json spaces", 2);
 
 // Helper function to extract video ID from a YouTube URL
 function extractVideoId(url) {
@@ -7,7 +13,7 @@ function extractVideoId(url) {
     return match ? match[1] : null;
 }
 
-async function ytsearch(query) {
+async function ytSearch(query) {
     return new Promise((resolve, reject) => {
         try {
             // Check if the query is a URL and extract the video ID
@@ -38,3 +44,27 @@ async function ytsearch(query) {
         }
     });
 }
+
+app.get('/', async (req, res) => {
+  const query = req.query.query
+  if (!query) {
+    return res.status(400).json({ creator: 'GiftedTech', status: 400, success: false, error: 'Missing query parameter' })
+  }
+
+  try {
+    const results = await ytSearch(query)
+    res.json({
+      creator: 'GiftedTech',
+      status: 200,
+      success: true,
+      results: results,
+    })
+  } catch (error) {
+    console.error('Error fetching yts data:', error)
+    res.status(500).json({ creator: 'GiftedTech', status: 500, success: false, error: 'Internal Server Error' })
+  }
+})
+
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`)
+})
