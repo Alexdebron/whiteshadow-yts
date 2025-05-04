@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "A Simple Yts",
   "main": "./index.js",
-  "type": "module",
   "scripts": {
     "start": "node index.js"  
   },
