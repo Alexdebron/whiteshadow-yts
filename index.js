@@ -40,7 +40,7 @@ async function ytSearch(query) {
                         url: `https://www.youtube.com/watch?v=${video.videoId}`,
                         views: video.views,
                         published: video.ago,
-                        author: video.author.name,
+                        author: video.author?.name,
                         duration: video.timestamp,
                         thumbnail: video.thumbnail,
                         isLive: false
