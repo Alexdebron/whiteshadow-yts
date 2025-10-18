@@ -2,11 +2,10 @@ const yts = require("yt-search");
 const express = require("express");
 const app = express();
 app.use(express.json());
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 2600;
 app.enable("trust proxy");
 app.set("json spaces", 2);
 
-// Helper function to extract video ID from a YouTube URL
 function extractVideoId(url) {
     const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/;
     const match = url.match(regex);
@@ -16,7 +15,6 @@ function extractVideoId(url) {
 async function ytSearch(query) {
     return new Promise((resolve, reject) => {
         try {
-            // Check if the query is a URL and extract the video ID
             let searchQuery = query;
             if (query.startsWith('http://') || query.startsWith('https://')) {
                 const videoId = extractVideoId(query);
@@ -28,10 +26,8 @@ async function ytSearch(query) {
                 }
             }
 
-            // Perform the search
             yts(searchQuery)
                 .then((data) => {
-                    // Transform the data to match RapidAPI format
                     const videos = data.all.map(video => ({
                         type: video.type,
                         id: video.videoId,
@@ -45,7 +41,7 @@ async function ytSearch(query) {
                         thumbnail: video.thumbnail,
                         isLive: false
                     }));
-                    resolve({ videos }); // Return in RapidAPI format
+                    resolve({ videos }); 
                 })
                 .catch((error) => {
                     reject(error);
@@ -59,7 +55,7 @@ async function ytSearch(query) {
 }
 
 app.get('/', async (req, res) => {
-    const query = req.query.q; // Changed from 'query' to 'q' to match RapidAPI
+    const query = req.query.q || req.query.query; 
     if (!query) {
         return res.status(400).json({ 
             success: false, 
@@ -69,7 +65,7 @@ app.get('/', async (req, res) => {
 
     try {
         const results = await ytSearch(query);
-        res.json(results); // Return the transformed data directly
+        res.json(results); 
     } catch (error) {
         console.error('Error fetching yts data:', error);
         res.status(500).json({ 
@@ -80,5 +76,5 @@ app.get('/', async (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+    console.log(`Server is running on port: ${port}`);
 });
