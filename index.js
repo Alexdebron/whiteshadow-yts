@@ -1,6 +1,17 @@
+const cors = require('cors'); 
 const yts = require("yt-search");
 const express = require("express");
 const app = express();
+
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  credentials: false, 
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+}));
+
 app.use(express.json());
 const port = process.env.PORT || 2600;
 app.enable("trust proxy");
